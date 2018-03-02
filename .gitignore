@@ -12,3 +12,5 @@ bin/
 
 configs/
 events/
+
+data/background_spectra/
