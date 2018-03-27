@@ -166,7 +166,7 @@ if __name__ == '__main__':
   parser.add_argument('ngen', type=str, help='number of particles of each type to shoot')
   parser.add_argument('-o', '--output', default='./events/', type=str, help='simulation output directory')
   parser.add_argument('-w', '--pixWidth', default=1.5, type=float, help='pixel width')
-  parser.add_argument('-n', '--npix', default=5000, type=float, help='linear size of the sensor')
+  parser.add_argument('-n', '--npix', default=5000, type=int, help='linear size of the sensor')
   parser.add_argument('-r', '--runtime_spectra_path', default='data/background_spectra/', type=str, help='overrides path to spectra files')
   parser.add_argument('-s', '--super_seed', default=12345, type=int, help='seed to generate seeds')
   parser.add_argument('-j', '--jobs', default=1, type=int, help='split simulation between number of jobs (per particle type)')
@@ -204,6 +204,8 @@ if __name__ == '__main__':
     os.makedirs(args.configs_output)
   except OSError:
     pass
+
+  print('There are total %d tasks.' % len(configs))
 
   for i, (name, values) in enumerate(configs):
     values['seed1'] = seed1

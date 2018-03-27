@@ -9,7 +9,7 @@
 // the config file and dynamically allocate,
 // but it's a big pain in the ass to get the
 // DetectorConstruction to communicate with this object :(
-#define MAX_PIX 5001
+#define MAX_PIX 3001
 
 class OutputManager
 {

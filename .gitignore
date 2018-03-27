@@ -14,3 +14,5 @@ configs/
 events/
 
 data/background_spectra/
+
+.idea/
