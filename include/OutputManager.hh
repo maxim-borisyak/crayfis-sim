@@ -20,13 +20,13 @@ public:
 	void finalize();
 
 	void resetNtuple();
-	void fillNtuple();
-	void fillEdep();
+	void fillPixels();
+	void fillEvent();
 	void addPixel(int x, int y);
 
-	void setPhi(double newPhi) {phi = newPhi;};
-	void setEnergy(double newEnergy) {energy = newEnergy;};
-	void setEdep(double newEdep) { Edep = newEdep;};
+	void setParticle(G4int pid, G4double energy, G4double theta, G4double phi);
+	void setEdep(double newEdep) { fEdep = newEdep;};
+	void setEdep_nonionizing(double newEdep) { fEdep_nonionizing = newEdep; }
 	double getNGen() { return fCuts->GetBinContent(1); };
 	double getNPass() { return fCuts->GetBinContent(2); };
 
@@ -39,30 +39,19 @@ private:
 	static OutputManager* _inst;
 
 	TFile*                  fOutfile;
-	TTree*                  fNtuple;
-	TTree*                  fEdep;
+	TTree*                  fPixels;
+	TTree*                  fEvent;
 	TH1I*			fCuts;
 
 	std::vector<int>        pix_x;
 	std::vector<int>        pix_y;
 	std::vector<double>     pix_val;
-  /*
-	std::vector<double>     pix_n1;
-	std::vector<double>     pix_n2;
-	std::vector<double>     pix_n3;
-	std::vector<double>     pix_n4;
-	std::vector<double>     pix_n5;
-	std::vector<double>     pix_n6;
-	std::vector<double>     pix_n7;
-	std::vector<double>     pix_n8;
-	std::vector<int>    	pix_color;
-	std::vector<double>    	pix_r;
-	std::vector<double>    	pix_g;
-	std::vector<double>    	pix_b;
-  */
 	int                     pix_n;
 
-	double phi;
-	double energy;
-	double Edep;
+	int fPid;
+	double fEnergy;
+	double fTheta;
+	double fPhi;
+	double fEdep;
+	double fEdep_nonionizing;
 };
