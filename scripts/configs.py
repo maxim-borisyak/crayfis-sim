@@ -13,7 +13,7 @@ __all__ = [
 
 particles = ['e-', 'e+', 'gamma', 'mu-', 'mu+', 'proton']
 
-depths = [1.0, 0.05, 0.1, 0.2, 0.5, 0.75, 1.5, 2.0, 3.0, 5.0]
+depths = [1, 1.5, 2, 2.5, 5, 7.5, 10, 15, 20, 30, 50]
 
 def get_seeds(n, super_seed):
   import random
@@ -57,15 +57,13 @@ def get_spectrum(particle):
   bins = 10.0 ** (ns / 10.0 - 2)
   assert np.allclose(datfile[:, 0], (bins[1:] + bins[:-1]) / 2.0, rtol=1.0e-2, atol=0.0)
 
-  ### crayfis-sim wants KeV, data provided in MeV
-  bins *= 1000.0
   # ROOT is picky and wants python array.array for TH1F constructor
   binsx = array.array('d', bins)
-  h = r.TH1F("particleEnergy", particle, len(binsx)-1, binsx)
+  h = r.TH1F("energy", particle, len(binsx)-1, binsx)
   for i, rate in enumerate(datfile[:, 1]):
       h.Fill(
         (binsx[i] + binsx[i + 1]) / 2,
-        rate * (binsx[i + 1] - binsx[i]) / 1000.0
+        rate * (binsx[i + 1] - binsx[i])
       )
 
   return h
@@ -116,7 +114,7 @@ def generate_configs(output_dir, ngen=int(1.0e+5), pixWidth=1.5, pixDepth=None, 
   print("Total flux: %.3e" % np.sum(fluxes))
   print(
     "Fluxes:\n  %s" % '\n  '.join([
-      "%s: %.3e" % (particle, flux)
+      "%s: %.3e MeV" % (particle, flux)
       for particle, flux in zip(particles, fluxes)
     ])
   )
@@ -139,9 +137,9 @@ def generate_configs(output_dir, ngen=int(1.0e+5), pixWidth=1.5, pixDepth=None, 
     for hist in hists
   ]
 
-  for depth in pixDepth:
-    for particle, hist in zip(particles, runtime_hists):
-      for job in range(jobs):
+  for job in range(jobs):
+    for depth in pixDepth:
+      for particle, hist in zip(particles, runtime_hists):
         name = '{particle}_{job:06d}_depth={depth}'.format(particle=particle, job=job, depth=depth)
         config = dict(
           beamEnergy=-1,
@@ -208,9 +206,6 @@ if __name__ == '__main__':
   print('There are total %d tasks.' % len(configs))
 
   for i, (name, values) in enumerate(configs):
-    values['seed1'] = seed1
-    values['seed2'] = seed2
-
     path = osp.join(args.configs_output, '%09d_%s.mac' % (i, name))
 
     with open(path, 'w') as f:

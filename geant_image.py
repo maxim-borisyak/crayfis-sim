@@ -123,4 +123,4 @@ if __name__ == "__main__":
 
     img = random_composite(t, ntrack=args.N, trans=trans_quant)
     img.save(args.output_file, format='jpeg', quality=98)
-    print "Saved to", args.output_file
+    print("Saved to", args.output_file)

@@ -14,18 +14,22 @@ RUN tar xvfz root_v6.12.06.Linux-ubuntu16-x86_64-gcc5.4.tar.gz
 WORKDIR /usr/opt/root
 
 RUN apt-get install -y apt-utils cmake
-RUN apt-get install -y libtbb2 g++ gcc
+RUN apt-get install -y libtbb2 g++-4.7 gcc-4.7
 RUN apt-get install -y python
 RUN apt-get install -y make
 RUN apt-get install -y python-dev
+
+RUN apt-get update
+RUN apt-get upgrade -y binutils
 
 ### GEANT
 WORKDIR /usr/opt
 
 RUN wget http://geant4.web.cern.ch/geant4/support/source/geant4.10.01.p03.tar.gz
-RUN tar xvfz geant4.10.01.p03.tar.gz
 
 WORKDIR /usr/opt/geant_build
+
+ENV CXX g++-4.7
 
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/opt/geant -DGEANT4_INSTALL_DATA=ON -DBUILD_SHARED_LIBS=ON /usr/opt/geant4.10.01.p03/
 RUN make -j8
