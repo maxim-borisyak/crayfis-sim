@@ -90,7 +90,7 @@ def get_total_flux(path):
   import ROOT as r
 
   f = r.TFile(path)
-  h = f.Get('particleEnergy')
+  h = f.Get('energy')
 
   return np.sum([
     h.GetBinContent(i)
@@ -164,10 +164,10 @@ if __name__ == '__main__':
   parser.add_argument('ngen', type=str, help='number of particles of each type to shoot')
   parser.add_argument('-o', '--output', default='./events/', type=str, help='simulation output directory')
   parser.add_argument('-w', '--pixWidth', default=1.5, type=float, help='pixel width')
-  parser.add_argument('-n', '--npix', default=5000, type=int, help='linear size of the sensor')
+  parser.add_argument('-n', '--npix', default=3000, type=int, help='linear size of the sensor')
   parser.add_argument('-r', '--runtime_spectra_path', default='data/background_spectra/', type=str, help='overrides path to spectra files')
   parser.add_argument('-s', '--super_seed', default=12345, type=int, help='seed to generate seeds')
-  parser.add_argument('-j', '--jobs', default=1, type=int, help='split simulation between number of jobs (per particle type)')
+  parser.add_argument('-j', '--jobs', default=1000, type=int, help='split simulation between number of jobs (per particle type)')
   parser.add_argument('-d', '--pixDepth', default=None, type=float, help='pixel depth (by default simulation enumerates a range of depths).')
   parser.add_argument('-c', '--configs_output', default='./configs/', type=str, help='output for the generated config files')
 

@@ -1,7 +1,7 @@
 # example driver macro
 
 # beam energy in keV
-/control/alias beamEnergy 1300
+/control/alias beamEnergy 0
 # beam particle (gamma, mu-, e-, etc)
 /control/alias bParticle $particle
 
