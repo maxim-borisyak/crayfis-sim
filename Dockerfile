@@ -56,7 +56,7 @@ WORKDIR /usr/app/
 RUN bash -c "export G4INSTALL=/usr/opt/geant/ && source /usr/opt/root/bin/thisroot.sh && source /usr/opt/geant/share/Geant4-10.1.3/geant4make/geant4make.sh && export G4G4WORKDIR=/usr/geant_workdir && make -j9"
 
 WORKDIR /usr/app/
-RUN bash -c "source /usr/opt/root/bin/thisroot.sh && python scripts/configs.py 1000000 -n 3000 -j1000 -o /output"
+RUN bash -c "source /usr/opt/root/bin/thisroot.sh && python scripts/configs.py 10000 -n 3000 -j1000 -o /output"
 
 COPY run.sh /usr/app/
 COPY run.py /usr/app/
