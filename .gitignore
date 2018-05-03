@@ -16,3 +16,10 @@ events/
 data/background_spectra/
 
 .idea/
+
+cluster-submit.py
+states/
+
+run-local.sh
+simlocal_log.txt
+gdb_commands

@@ -10,5 +10,8 @@ if __name__ == '__main__':
     path = os.path.join('./configs', item)
     i = int(item.split('_')[0])
     if i == target:
-      retcode = subprocess.call(['./bin/TestEm1', path])
+      retcode = subprocess.call([
+        'bash', 'seg_wrapper.sh', './bin/TestEm1', path
+      ])
+
       sys.exit(retcode)
