@@ -1,10 +1,5 @@
 from setuptools import setup, find_packages
 
-from codecs import open
-import os
-import os.path as osp
-import numpy as np
-
 setup(
   name='craysim',
 
@@ -34,7 +29,7 @@ setup(
 
   keywords='',
 
-  packages=find_packages(where='pycraysim', exclude=['contrib', 'examples', 'docs', 'tests']),
+  packages=find_packages(where='.', exclude=['contrib', 'examples', 'docs', 'tests']),
 
   extras_require={
     'dev': ['check-manifest'],

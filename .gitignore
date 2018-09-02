@@ -23,3 +23,5 @@ states/
 run-local.sh
 simlocal_log.txt
 gdb_commands
+
+craysim.egg-info/
