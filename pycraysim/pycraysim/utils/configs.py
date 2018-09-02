@@ -1,15 +1,20 @@
-from args import dict_product
 import os
 import os.path as osp
-
-import ROOT as r
 
 import array
 import numpy as np
 
 particles = ['e-', 'e+', 'gamma', 'mu-', 'mu+', 'proton']
 
-depths = [1, 1.5, 2, 2.5, 5, 7.5, 10, 15, 20, 30, 50]
+def get_package_root():
+  path = osp.abspath(osp.dirname(__file__))
+
+  for i in range(3):
+   path = osp.split(path)[0]
+
+  return path
+
+PACKAGE_ROOT = get_package_root()
 
 def seed_stream(super_seed):
   import random
@@ -40,10 +45,9 @@ def get_seeds(n, super_seed):
 
   return numbers
 
-def get_resource(path, dir=True):
-  here = osp.dirname(osp.abspath(__file__))
+def get_resource(paths, dir=True):
+  resourse = osp.abspath(osp.join(PACKAGE_ROOT, *paths))
 
-  resourse = osp.abspath(osp.join(here, path))
   assert osp.exists(resourse) and (osp.isdir if dir else osp.isfile)(resourse), \
     'resourse {what} [{where}] does not seem like a {what}'.format(
       where = resourse, what = 'directory' if dir else 'file'
@@ -51,10 +55,10 @@ def get_resource(path, dir=True):
 
   return resourse
 
-get_dir = lambda path: get_resource(path, dir=True)
-get_file = lambda path: get_resource(path, dir=False)
+get_dir = lambda *paths: get_resource(paths, dir=True)
+get_file = lambda *paths: get_resource(paths, dir=False)
 
-def get_config_template(path='../data/config/run.mac.template'):
+def get_config_template(path='data/config/run.mac.template'):
   path = get_file(path)
 
   with open(path, 'r') as f:
@@ -64,7 +68,8 @@ def get_spectrum(particle):
   import ROOT as r
 
   try:
-    path = get_file(osp.join('../data/diff_spectra/', particle + '.dat'))
+    path = get_file('data/diff_spectra/', particle + '.dat')
+
     datfile = np.loadtxt(path)
   except Exception as e:
     datfile = np.loadtxt(particle)
@@ -87,8 +92,8 @@ def get_spectrum(particle):
 
 def generate_spectra(particles=particles):
   import ROOT as r
-  data_dir = get_dir('../data')
-  spectra_dir = osp.join(data_dir, 'background_spectra')
+
+  spectra_dir = get_dir('data', 'background_spectra')
 
   try:
     os.makedirs(spectra_dir)
@@ -114,7 +119,7 @@ def get_total_flux(path):
     for i in range(h.GetSize())
   ])
 
-def get_priors(data_root='../data', spectra_dir='background_spectra'):
+def get_priors(data_root=get_dir('data'), spectra_dir='background_spectra'):
   spectra_path = osp.join(data_root, spectra_dir)
 
   flux = dict()
@@ -131,13 +136,10 @@ def get_priors(data_root='../data', spectra_dir='background_spectra'):
 
 BINARY = 'TestEm1'
 
-def get_binary(path='../bin'):
-  return get_file(osp.join(path, BINARY))
+def get_binary():
+  return get_file('bin', BINARY)
 
-def generate_configs(output_dir, ngen=int(1.0e+5), pixWidth=1.5, pixDepth=None, npix=5000, spectra_path=None, jobs=1):
-  if pixDepth is None:
-    pixDepth = depths
-
+def generate_configs(output_dir, ngen=int(1.0e+5), pixWidth=1.5, pixDepth=(1, ), npix=5000, spectra_path=None, jobs=1):
   print('Pixel depths: %s' % pixDepth)
 
   hist_dir = generate_spectra(particles=particles)
@@ -214,7 +216,7 @@ if __name__ == '__main__':
   except OSError:
     pass
 
-  with open(get_file('../data/config/run.mac.template'), 'r') as _f:
+  with open(get_file('data/config/run.mac.template'), 'r') as _f:
     from string import Template
     config = Template(_f.read())
 
