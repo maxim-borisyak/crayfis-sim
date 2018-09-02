@@ -12,6 +12,11 @@ from itertools import izip, repeat
 
 import tempfile
 
+__all__ = [
+  'sim_worker',
+  'SimStream'
+]
+
 def sim_worker(args):
   config, working_dir, seed, template = args
 
