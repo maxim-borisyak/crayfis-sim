@@ -58,7 +58,7 @@ def get_resource(paths, dir=True):
 get_dir = lambda *paths: get_resource(paths, dir=True)
 get_file = lambda *paths: get_resource(paths, dir=False)
 
-def get_config_template(path='data/config/run.mac.template'):
+def get_config_template(path='config/run.mac.template'):
   path = get_file(path)
 
   with open(path, 'r') as f:
@@ -93,7 +93,8 @@ def get_spectrum(particle):
 def generate_spectra(particles=particles):
   import ROOT as r
 
-  spectra_dir = get_dir('data', 'background_spectra')
+  data_dir = get_dir('data')
+  spectra_dir = osp.join(data_dir, 'background_spectra')
 
   try:
     os.makedirs(spectra_dir)
@@ -216,7 +217,7 @@ if __name__ == '__main__':
   except OSError:
     pass
 
-  with open(get_file('data/config/run.mac.template'), 'r') as _f:
+  with open(get_config_template(), 'r') as _f:
     from string import Template
     config = Template(_f.read())
 
