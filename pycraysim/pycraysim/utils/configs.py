@@ -58,6 +58,8 @@ def get_resource(paths, dir=True):
 get_dir = lambda *paths: get_resource(paths, dir=True)
 get_file = lambda *paths: get_resource(paths, dir=False)
 
+get_config_path = lambda : get_file('config/run.mac.template')
+
 def get_config_template(path='config/run.mac.template'):
   path = get_file(path)
 
@@ -217,7 +219,7 @@ if __name__ == '__main__':
   except OSError:
     pass
 
-  with open(get_config_template(), 'r') as _f:
+  with open(get_config_path(), 'r') as _f:
     from string import Template
     config = Template(_f.read())
 

@@ -95,7 +95,7 @@ class SimStream(object):
     self.pool = Pool(num_workers, maxtasksperchild=1)
 
     config_stream = izip(
-      configs, repeat(self.work_dir), self.seed_stream, self.template
+      configs, repeat(self.work_dir), self.seed_stream, repeat(self.template)
     )
 
     self.result_stream = self.pool.imap(sim_worker, config_stream, chunksize=1)
@@ -104,6 +104,9 @@ class SimStream(object):
 
   def stream(self):
     for config, stdout, stderr, workspace, output_path in self.result_stream:
+      if output_path is None:
+        raise Exception(stdout + '\n' + stderr)
+
       try:
         yield self.copy_op(self.target_dir, config, stdout, stderr)
       except Exception as e:
