@@ -26,7 +26,7 @@ def sim_worker(args):
     template = get_config_template()
 
   config_path = osp.abspath(osp.join(workspace, 'run.mac'))
-  output_path = osp.abspath(osp.join(workspace, 'output.root'))
+  output_path = osp.abspath(osp.join(workspace, 'output'))
 
   config = config.copy()
   config['output'] = output_path
@@ -50,7 +50,7 @@ def sim_worker(args):
   retcode = process.wait()
 
   if retcode == 0:
-    return config, stdout, stderr, workspace, output_path
+    return config, stdout, stderr, workspace, output_path + '.root'
   else:
     return config, stdout, stderr, workspace, None
 
@@ -59,7 +59,7 @@ def default_copy(target_dir, config, stdout, stderr):
   import json
 
   config = config.copy()
-  origin = config.pop('output', None)
+  origin = config.pop('output') + '.root'
   try:
     extension = origin.split('.')[-1]
   except:
@@ -105,7 +105,7 @@ class SimStream(object):
   def stream(self):
     for config, stdout, stderr, workspace, output_path in self.result_stream:
       if output_path is None:
-        raise Exception(stdout + '\n' + stderr)
+        raise Exception(stdout + '\n\n' + stderr)
 
       try:
         yield self.copy_op(self.target_dir, config, stdout, stderr)
@@ -116,3 +116,6 @@ class SimStream(object):
         warnings.warn(str(config))
         traceback.print_exc()
 
+  def clean(self):
+    import shutil as sh
+    sh.rmtree(self.work_dir)
