@@ -50,7 +50,7 @@ RUN apt-get install -y valgrind
 COPY data /usr/app/data
 COPY include /usr/app/include
 COPY src /usr/app/src
-COPY scripts /usr/app/scripts
+COPY pycraysim/pycraysim/utils /usr/app/scripts
 COPY GNUmakefile /usr/app/
 COPY TestEm1.cc /usr/app/
 

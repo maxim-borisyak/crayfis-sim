@@ -1,4 +1,4 @@
-from utils import dict_product
+from args import dict_product
 import os
 import os.path as osp
 
@@ -7,13 +7,24 @@ import ROOT as r
 import array
 import numpy as np
 
-__all__ = [
-  'generate_configs'
-]
-
 particles = ['e-', 'e+', 'gamma', 'mu-', 'mu+', 'proton']
 
 depths = [1, 1.5, 2, 2.5, 5, 7.5, 10, 15, 20, 30, 50]
+
+def seed_stream(super_seed):
+  import random
+  random.seed(super_seed)
+
+  used_seeds= set()
+
+  while True:
+    seed = (random.randrange(int(1.0e+6)), random.randrange(int(1.0e+6)))
+
+    if seed in used_seeds:
+      continue
+    else:
+      used_seeds.add(seed)
+      yield seed
 
 def get_seeds(n, super_seed):
   import random
@@ -29,7 +40,7 @@ def get_seeds(n, super_seed):
 
   return numbers
 
-def get_resourse(path, dir=True):
+def get_resource(path, dir=True):
   here = osp.dirname(osp.abspath(__file__))
 
   resourse = osp.abspath(osp.join(here, path))
@@ -40,8 +51,14 @@ def get_resourse(path, dir=True):
 
   return resourse
 
-get_dir = lambda path: get_resourse(path, dir=True)
-get_file = lambda path: get_resourse(path, dir=False)
+get_dir = lambda path: get_resource(path, dir=True)
+get_file = lambda path: get_resource(path, dir=False)
+
+def get_config_template(path='../data/config/run.mac.template'):
+  path = get_file(path)
+
+  with open(path, 'r') as f:
+    return f.read()
 
 def get_spectrum(particle):
   import ROOT as r
@@ -97,6 +114,25 @@ def get_total_flux(path):
     for i in range(h.GetSize())
   ])
 
+def get_priors(data_root='../data', spectra_dir='background_spectra'):
+  spectra_path = osp.join(data_root, spectra_dir)
+
+  flux = dict()
+  for particle in particles:
+    particle_flux = get_total_flux(osp.join(spectra_path, particle + '.root'))
+    flux[particle] = particle_flux
+
+  total_flux = np.sum([ v for k, v in flux.values() ])
+
+  return dict([
+    (k, v / total_flux)
+    for k, v in flux.items()
+  ])
+
+BINARY = 'TestEm1'
+
+def get_binary(path='../bin'):
+  return get_file(osp.join(path, BINARY))
 
 def generate_configs(output_dir, ngen=int(1.0e+5), pixWidth=1.5, pixDepth=None, npix=5000, spectra_path=None, jobs=1):
   if pixDepth is None:
