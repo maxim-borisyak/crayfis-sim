@@ -67,7 +67,7 @@ def default_copy(target_dir, config, stdout, stderr):
 
   props = sorted([ (k, v) for k, v in config.items() ], key=lambda x: x[0])
   name = '_'.join([ '%s=%s' % (k, v) for k, v in props ])
-  target_path = osp.join(target_dir, name) + extension
+  target_path = osp.join(target_dir, name) + '.' + extension
 
   try:
     sh.move(origin, target_path)
@@ -107,7 +107,9 @@ class SimStream(object):
       try:
         yield self.copy_op(self.target_dir, config, stdout, stderr)
       except Exception as e:
+        import traceback
         import warnings
-        warnings.warn(e.message)
+
         warnings.warn(str(config))
+        traceback.print_exc()
 
