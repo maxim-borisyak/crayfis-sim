@@ -4,7 +4,7 @@ from multiprocessing import Pool
 
 import os.path as osp
 
-from ..utils import get_config_template, get_binary, seed_stream
+from ..utils import get_config_template, get_binary, seed_stream, PACKAGE_ROOT
 
 from string import Template
 
@@ -34,9 +34,8 @@ def sim_worker(args):
     )
 
   process = sp.Popen(
-    args=[config_path],
-    executable=get_binary(),
-    cwd=workspace,
+    args=[get_binary(), config_path],
+    cwd=PACKAGE_ROOT,
     stdin=sp.PIPE,
     stdout=sp.PIPE,
     stderr=sp.PIPE
