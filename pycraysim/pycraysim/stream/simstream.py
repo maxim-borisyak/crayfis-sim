@@ -65,6 +65,8 @@ def default_copy(target_dir, config, stdout, stderr):
   except:
     extension = ''
 
+  config.pop('energyHisto')
+
   props = sorted([ (k, v) for k, v in config.items() ], key=lambda x: x[0])
   name = '_'.join([ '%s=%s' % (k, v) for k, v in props ])
   target_path = osp.join(target_dir, name) + '.' + extension
