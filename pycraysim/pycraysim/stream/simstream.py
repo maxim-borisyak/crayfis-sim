@@ -71,9 +71,9 @@ def default_copy(target_dir, config, stdout, stderr):
 
   try:
     sh.move(origin, target_path)
-  except Exception as e:
-    import warnings
-    warnings.warn(e.message)
+  except:
+    import traceback
+    traceback.print_exc()
 
   with open(target_path + '.json', 'w') as f:
     json.dump(config, f)
