@@ -101,7 +101,7 @@ def sim_job(config):
     target_name = naming(config)
 
     if osp.exists(osp.join(target_dir, target_name)):
-      return
+      print('Output file already exists. Skipping.')
   except:
     import traceback
     traceback.print_exc()
