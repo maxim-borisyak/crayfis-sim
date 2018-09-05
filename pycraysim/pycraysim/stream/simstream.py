@@ -2,6 +2,7 @@ import subprocess as sp
 
 from multiprocessing import Pool
 
+import os
 import os.path as osp
 
 from ..utils import get_config_template, get_binary, seed_stream, PACKAGE_ROOT
@@ -13,6 +14,7 @@ from itertools import izip, repeat
 import tempfile
 
 __all__ = [
+  'sim_job',
   'sim_worker',
   'SimStream'
 ]
@@ -54,7 +56,7 @@ def sim_worker(args):
   else:
     return config, stdout, stderr, workspace, None
 
-def default_copy(target_dir, config, stdout, stderr):
+def default_move(target_dir, config, stdout, stderr, retcode):
   import shutil as sh
   import json
 
@@ -72,7 +74,8 @@ def default_copy(target_dir, config, stdout, stderr):
   target_path = osp.join(target_dir, name) + '.' + extension
 
   try:
-    sh.move(origin, target_path)
+    if retcode == 0:
+      sh.move(origin, target_path)
   except:
     import traceback
     traceback.print_exc()
@@ -88,8 +91,51 @@ def default_copy(target_dir, config, stdout, stderr):
 
   return target_path
 
+def sim_job(config):
+  config = config.copy()
+  workspace = tempfile.mkdtemp(prefix='crayfis-sim')
+
+  try:
+    template = get_config_template()
+
+    target_dir = config.pop('target')
+
+    config_path = osp.abspath(osp.join(workspace, 'run.mac'))
+    output_path = osp.abspath(osp.join(workspace, 'output'))
+
+    config['output'] = output_path
+
+    with open(config_path, 'w') as f:
+      f.write(
+        Template(template).substitute(**config)
+      )
+
+    process = sp.Popen(
+      args=[get_binary(), config_path],
+      cwd=PACKAGE_ROOT,
+      stdin=sp.PIPE,
+      stdout=sp.PIPE,
+      stderr=sp.PIPE
+    )
+
+    stdout, stderr = process.communicate()
+    retcode = process.wait()
+
+    default_move(target_dir, config, stdout, stderr, retcode)
+  except:
+    import traceback
+    traceback.print_exc()
+  finally:
+    try:
+      import shutil as sh
+      sh.rmtree(workspace)
+    except:
+      import traceback
+      traceback.print_exc()
+
+
 class SimStream(object):
-  def __init__(self, target_dir, configs, super_seed, copy_op=default_copy, num_workers=1):
+  def __init__(self, target_dir, configs, super_seed, copy_op=default_move, num_workers=1):
     self.template = get_config_template()
     self.work_dir = tempfile.mkdtemp(prefix='craysim')
 
