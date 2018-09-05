@@ -56,22 +56,25 @@ def sim_worker(args):
   else:
     return config, stdout, stderr, workspace, None
 
+def naming(config):
+  config = config.copy()
+
+  config.pop('energyHisto', None)
+  config.pop('output', None)
+
+  props = sorted([(k, v) for k, v in config.items()], key=lambda x: x[0])
+  name = '_'.join(['%s=%s' % (k, v) for k, v in props])
+  return name + '.root'
+
+
 def default_move(target_dir, config, stdout, stderr, retcode):
   import shutil as sh
   import json
 
   config = config.copy()
-  origin = config.pop('output') + '.root'
-  try:
-    extension = origin.split('.')[-1]
-  except:
-    extension = ''
+  origin = config['output'] + '.root'
 
-  config.pop('energyHisto')
-
-  props = sorted([ (k, v) for k, v in config.items() ], key=lambda x: x[0])
-  name = '_'.join([ '%s=%s' % (k, v) for k, v in props ])
-  target_path = osp.join(target_dir, name) + '.' + extension
+  target_path = osp.join(target_dir, config.pop('output'))
 
   try:
     if retcode == 0:
@@ -93,12 +96,21 @@ def default_move(target_dir, config, stdout, stderr, retcode):
 
 def sim_job(config):
   config = config.copy()
+  try:
+    target_dir = config.pop('target')
+    target_name = naming(config)
+
+    if osp.exists(osp.join(target_dir, target_name)):
+      return
+  except:
+    import traceback
+    traceback.print_exc()
+    return
+
   workspace = tempfile.mkdtemp(prefix='crayfis-sim')
 
   try:
     template = get_config_template()
-
-    target_dir = config.pop('target')
 
     config_path = osp.abspath(osp.join(workspace, 'run.mac'))
     output_path = osp.abspath(osp.join(workspace, 'output'))
