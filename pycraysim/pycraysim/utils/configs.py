@@ -92,6 +92,18 @@ def get_spectrum(particle):
 
   return h
 
+def check_spectra(particles=particles):
+  try:
+    spectra_dir = get_dir('data', 'background_spectra')
+
+    for particle in particles:
+      if not osp.exists(osp.join(spectra_dir, particle + '.root')):
+        return False
+
+    return True
+  except:
+    return False
+
 def generate_spectra(particles=particles):
   import ROOT as r
 

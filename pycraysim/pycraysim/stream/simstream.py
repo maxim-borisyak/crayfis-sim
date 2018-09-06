@@ -67,40 +67,40 @@ def naming(config):
   return name + '.root'
 
 
-def default_move(target_dir, config, stdout, stderr, retcode):
+def move(destination, config, stdout, stderr, retcode):
   import shutil as sh
   import json
 
   config = config.copy()
   origin = config['output'] + '.root'
 
-  target_path = osp.join(target_dir, config.pop('output'))
-
   try:
     if retcode == 0:
-      sh.move(origin, target_path)
+      sh.move(origin, destination)
+    else:
+      raise Exception('Return code is not 0!')
   except:
     import traceback
     traceback.print_exc()
 
-  with open(target_path + '.json', 'w') as f:
+  with open(destination + '.json', 'w') as f:
     json.dump(config, f)
 
-  with open(target_path + '.stdout', 'w') as f:
+  with open(destination + '.stdout', 'w') as f:
     f.write(stdout)
 
-  with open(target_path + '.stderr', 'w') as f:
+  with open(destination + '.stderr', 'w') as f:
     f.write(stderr)
 
-  return target_path
+  return destination
 
 def sim_job(config):
   config = config.copy()
   try:
     target_dir = config.pop('target')
-    target_name = naming(config)
+    target_path = osp.join(target_dir, naming(config))
 
-    if osp.exists(osp.join(target_dir, target_name)):
+    if osp.exists(target_path):
       print('Output file already exists. Skipping.')
       return
   except:
@@ -134,7 +134,7 @@ def sim_job(config):
     stdout, stderr = process.communicate()
     retcode = process.wait()
 
-    default_move(target_dir, config, stdout, stderr, retcode)
+    move(target_path, config, stdout, stderr, retcode)
   except:
     import traceback
     traceback.print_exc()
@@ -148,7 +148,7 @@ def sim_job(config):
 
 
 class SimStream(object):
-  def __init__(self, target_dir, configs, super_seed, copy_op=default_move, num_workers=1):
+  def __init__(self, target_dir, configs, super_seed, copy_op=move, num_workers=1):
     self.template = get_config_template()
     self.work_dir = tempfile.mkdtemp(prefix='craysim')
 
